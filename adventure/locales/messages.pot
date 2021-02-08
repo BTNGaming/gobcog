@@ -29,11 +29,11 @@ msgid "Your basic adventuring hero."
 msgstr ""
 
 #: adventure.py:119
-msgid "Herbert"
+msgid "Lucas the Almighty"
 msgstr ""
 
 #: adventure.py:120
-msgid "Hawl's brother"
+msgid "Raspberry Mike"
 msgstr ""
 
 #: adventure.py:218
