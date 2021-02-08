@@ -4326,7 +4326,7 @@ class Adventure(commands.Cog):
                     pet_choices = list(pet_list.keys())
                     pet = random.choice(pet_choices)
                     roll = random.randint(1, 50)
-                    dipl_value = c.total_cha + (c.total_int // 3) + (c.luck // 2)
+                    dipl_value = c.total_cha + c.total_int + c.luck
                     pet_reqs = pet_list[pet].get("bonuses", {}).get("req", {})
                     pet_msg4 = ""
                     can_catch = True
