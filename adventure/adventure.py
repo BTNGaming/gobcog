@@ -3030,7 +3030,7 @@ class Adventure(commands.Cog):
     async def forge(self, ctx):
         """[Tinkerer Class Only]
 
-        This allows a Tinkerer to forge two items into a device. (1h cooldown)
+        This allows a Tinkerer to forge two items into a device. (30m cooldown)
         """
         if self.in_adventure(ctx):
             return await smart_embed(ctx, _("You tried to forge an item but there were no forges nearby."))
@@ -3048,7 +3048,7 @@ class Adventure(commands.Cog):
                     _("**{}**, you need to be a Tinkerer to do this.").format(self.escape(ctx.author.display_name)),
                 )
             else:
-                cooldown_time = 3600
+                cooldown_time = 1800
                 if "cooldown" not in c.heroclass:
                     c.heroclass["cooldown"] = cooldown_time + 1
                 if c.heroclass["cooldown"] > time.time():
