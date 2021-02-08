@@ -3048,7 +3048,7 @@ class Adventure(commands.Cog):
                     _("**{}**, you need to be a Tinkerer to do this.").format(self.escape(ctx.author.display_name)),
                 )
             else:
-                cooldown_time = max(1800, (7200 - max((c.luck + c.total_int) * 2, 0)))
+                cooldown_time = max(3600)
                 if "cooldown" not in c.heroclass:
                     c.heroclass["cooldown"] = cooldown_time + 1
                 if c.heroclass["cooldown"] > time.time():
@@ -3485,7 +3485,7 @@ class Adventure(commands.Cog):
 
     @commands.command(cooldown_after_parsing=True)
     @commands.bot_has_permissions(add_reactions=True)
-    @commands.cooldown(rate=1, per=7200, type=commands.BucketType.user)
+    @commands.cooldown(rate=1, per=3600, type=commands.BucketType.user)
     async def heroclass(self, ctx: commands.Context, clz: str = None, action: str = None):
         """Allows you to select a class if you are level 10 or above.
 
@@ -3604,7 +3604,7 @@ class Adventure(commands.Cog):
                     if c.heroclass["name"] == clz:
                         ctx.command.reset_cooldown(ctx)
                         return await smart_embed(ctx, _("You already are a {}.").format(clz))
-                    if clz == "Psychic" and c.rebirths < 25:
+                    if clz == "Psychic" and c.rebirths < 10:
                         ctx.command.reset_cooldown(ctx)
                         return await smart_embed(ctx, _("You are too inexperienced to become a {}.").format(clz))
                     class_msg = await ctx.send(
@@ -3734,29 +3734,29 @@ class Adventure(commands.Cog):
                         c.heroclass = classes[clz]
                         if c.heroclass["name"] in ["Wizard", "Cleric"]:
                             c.heroclass["cooldown"] = (
-                                max(300, (1200 - max((c.luck + c.total_int) * 2, 0))) + time.time()
+                                max(300) + time.time()
                             )
                         elif c.heroclass["name"] == "Ranger":
                             c.heroclass["cooldown"] = (
-                                max(1800, (7200 - max(c.luck * 2 + c.total_int * 2, 0))) + time.time()
+                                max(300) + time.time()
                             )
                             c.heroclass["catch_cooldown"] = (
-                                max(600, (3600 - max(c.luck * 2 + c.total_int * 2, 0))) + time.time()
+                                max(300) + time.time()
                             )
                         elif c.heroclass["name"] == "Berserker":
                             c.heroclass["cooldown"] = (
-                                max(300, (1200 - max((c.luck + c.total_att) * 2, 0))) + time.time()
+                                max(300) + time.time()
                             )
                         elif c.heroclass["name"] == "Bard":
                             c.heroclass["cooldown"] = (
-                                max(300, (1200 - max((c.luck + c.total_cha) * 2, 0))) + time.time()
+                                max(300) + time.time()
                             )
                         elif c.heroclass["name"] == "Tinkerer":
                             c.heroclass["cooldown"] = (
-                                max(900, (3600 - max((c.luck + c.total_int) * 2, 0))) + time.time()
+                                max(300) + time.time()
                             )
                         elif c.heroclass["name"] == "Psychic":
-                            c.heroclass["cooldown"] = max(300, (900 - max((c.luck - c.total_cha) * 2, 0))) + time.time()
+                            c.heroclass["cooldown"] = max(300) + time.time()
                         await self.config.user(ctx.author).set(await c.to_json(self.config))
                         await self._clear_react(class_msg)
                         await class_msg.edit(content=box(now_class_msg, lang="css"))
@@ -3959,7 +3959,7 @@ class Adventure(commands.Cog):
                     "{currency_name} you are willing to offer to the gods for your success."
                 ).format(author=self.escape(ctx.author.display_name), currency_name=currency_name),
             )
-        if offering <= 500 or bal <= 500:
+        if offering <= 1000 or bal <= 1000:
             ctx.command.reset_cooldown(ctx)
             return await smart_embed(ctx, _("The gods refuse your pitiful offering."))
         if offering > bal:
@@ -4303,7 +4303,7 @@ class Adventure(commands.Cog):
                         )
                     )
                 else:
-                    cooldown_time = max(600, (3600 - max((c.luck + c.total_int) * 2, 0)))
+                    cooldown_time = max(1800)
                     if "catch_cooldown" not in c.heroclass:
                         c.heroclass["catch_cooldown"] = cooldown_time + 1
                     if c.heroclass["catch_cooldown"] > time.time():
@@ -4429,7 +4429,7 @@ class Adventure(commands.Cog):
                     )
                 )
                 return
-            cooldown_time = max(1800, (7200 - max((c.luck + c.total_int) * 2, 0)))
+            cooldown_time = max(1800)
             if "cooldown" not in c.heroclass:
                 c.heroclass["cooldown"] = cooldown_time + 1
             if c.heroclass["cooldown"] <= time.time():
@@ -4491,7 +4491,7 @@ class Adventure(commands.Cog):
                     return await smart_embed(
                         ctx, _("**{}**, ability already in use.").format(self.escape(ctx.author.display_name)),
                     )
-                cooldown_time = max(300, (1200 - max((c.luck + c.total_int) * 2, 0)))
+                cooldown_time = max(600)
                 if "cooldown" not in c.heroclass:
                     c.heroclass["cooldown"] = cooldown_time + 1
                 if c.heroclass["cooldown"] <= time.time():
@@ -4545,7 +4545,7 @@ class Adventure(commands.Cog):
                 return await smart_embed(
                     ctx, _("**{}**, ability already in use.").format(self.escape(ctx.author.display_name)),
                 )
-            cooldown_time = max(300, (900 - max((c.luck + c.total_cha) * 2, 0)))
+            cooldown_time = max(300)
             if "cooldown" not in c.heroclass:
                 c.heroclass["cooldown"] = cooldown_time + 1
             if c.heroclass["cooldown"] + cooldown_time <= time.time():
@@ -4705,7 +4705,7 @@ class Adventure(commands.Cog):
                     return await smart_embed(
                         ctx, _("**{}**, ability already in use.").format(self.escape(ctx.author.display_name)),
                     )
-                cooldown_time = max(300, (1200 - max((c.luck + c.total_att) * 2, 0)))
+                cooldown_time = max(300)
                 if "cooldown" not in c.heroclass:
                     c.heroclass["cooldown"] = cooldown_time + 1
                 if c.heroclass["cooldown"] <= time.time():
@@ -4752,7 +4752,7 @@ class Adventure(commands.Cog):
                     return await smart_embed(
                         ctx, _("**{}**, ability already in use.").format(self.escape(ctx.author.display_name)),
                     )
-                cooldown_time = max(300, (1200 - max((c.luck + c.total_int) * 2, 0)))
+                cooldown_time = max(300)
                 if "cooldown" not in c.heroclass:
                     c.heroclass["cooldown"] = cooldown_time + 1
                 if c.heroclass["cooldown"] <= time.time():
@@ -4800,7 +4800,7 @@ class Adventure(commands.Cog):
                     return await smart_embed(
                         ctx, _("**{}**, ability already in use.").format(self.escape(ctx.author.display_name)),
                     )
-                cooldown_time = max(300, (1200 - max((c.luck + c.total_cha) * 2, 0)))
+                cooldown_time = max(300)
                 if "cooldown" not in c.heroclass:
                     c.heroclass["cooldown"] = cooldown_time + 1
                 if c.heroclass["cooldown"] <= time.time():
@@ -8139,12 +8139,12 @@ class Adventure(commands.Cog):
 
     @commands.command(name="apayday", cooldown_after_parsing=True)
     @has_separated_economy()
-    @commands.cooldown(rate=1, per=600, type=commands.BucketType.user)
+    @commands.cooldown(rate=1, per=1800, type=commands.BucketType.user)
     async def commands_apayday(self, ctx: commands.Context):
         """Get some free gold."""
         author = ctx.author
         adventure_credits_name = await bank.get_currency_name(ctx.guild)
-        amount = 500  # Make Customizable?
+        amount = 2500  # Make Customizable?
         try:
             await bank.deposit_credits(author, amount)
         except BalanceTooHigh as exc:
