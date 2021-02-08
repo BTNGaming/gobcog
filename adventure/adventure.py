@@ -3485,7 +3485,7 @@ class Adventure(commands.Cog):
 
     @commands.command(cooldown_after_parsing=True)
     @commands.bot_has_permissions(add_reactions=True)
-    @commands.cooldown(rate=1, per=7200, type=commands.BucketType.user)
+    @commands.cooldown(rate=1, per=3600, type=commands.BucketType.user)
     async def heroclass(self, ctx: commands.Context, clz: str = None, action: str = None):
         """Allows you to select a class if you are level 10 or above.
 
@@ -3604,7 +3604,7 @@ class Adventure(commands.Cog):
                     if c.heroclass["name"] == clz:
                         ctx.command.reset_cooldown(ctx)
                         return await smart_embed(ctx, _("You already are a {}.").format(clz))
-                    if clz == "Psychic" and c.rebirths < 25:
+                    if clz == "Psychic" and c.rebirths < 10:
                         ctx.command.reset_cooldown(ctx)
                         return await smart_embed(ctx, _("You are too inexperienced to become a {}.").format(clz))
                     class_msg = await ctx.send(
@@ -3734,29 +3734,29 @@ class Adventure(commands.Cog):
                         c.heroclass = classes[clz]
                         if c.heroclass["name"] in ["Wizard", "Cleric"]:
                             c.heroclass["cooldown"] = (
-                                max(300, (1200 - max((c.luck + c.total_int) * 2, 0))) + time.time()
+                                1800
                             )
                         elif c.heroclass["name"] == "Ranger":
                             c.heroclass["cooldown"] = (
-                                max(1800, (7200 - max(c.luck * 2 + c.total_int * 2, 0))) + time.time()
+                                1800
                             )
                             c.heroclass["catch_cooldown"] = (
-                                max(600, (3600 - max(c.luck * 2 + c.total_int * 2, 0))) + time.time()
+                                1800
                             )
                         elif c.heroclass["name"] == "Berserker":
                             c.heroclass["cooldown"] = (
-                                max(300, (1200 - max((c.luck + c.total_att) * 2, 0))) + time.time()
+                                1800
                             )
                         elif c.heroclass["name"] == "Bard":
                             c.heroclass["cooldown"] = (
-                                max(300, (1200 - max((c.luck + c.total_cha) * 2, 0))) + time.time()
+                                1800
                             )
                         elif c.heroclass["name"] == "Tinkerer":
                             c.heroclass["cooldown"] = (
-                                max(900, (3600 - max((c.luck + c.total_int) * 2, 0))) + time.time()
+                                1800
                             )
                         elif c.heroclass["name"] == "Psychic":
-                            c.heroclass["cooldown"] = max(300, (900 - max((c.luck - c.total_cha) * 2, 0))) + time.time()
+                            c.heroclass["cooldown"] = 1800
                         await self.config.user(ctx.author).set(await c.to_json(self.config))
                         await self._clear_react(class_msg)
                         await class_msg.edit(content=box(now_class_msg, lang="css"))
@@ -3786,7 +3786,7 @@ class Adventure(commands.Cog):
 
     @commands.command()
     @commands.bot_has_permissions(add_reactions=True)
-    @commands.cooldown(rate=1, per=4, type=commands.BucketType.user)
+    @commands.cooldown(rate=1, per=2, type=commands.BucketType.user)
     async def loot(self, ctx: commands.Context, box_type: str = None, number: int = 1):
         """This opens one of your precious treasure chests.
 
@@ -3959,9 +3959,9 @@ class Adventure(commands.Cog):
                     "{currency_name} you are willing to offer to the gods for your success."
                 ).format(author=self.escape(ctx.author.display_name), currency_name=currency_name),
             )
-        if offering <= 500 or bal <= 500:
+        if offering <= 1000 or bal <= 1000:
             ctx.command.reset_cooldown(ctx)
-            return await smart_embed(ctx, _("The gods refuse your pitiful offering."))
+            return await smart_embed(ctx, _("Your offering is that of a measly peasant, Come back with a better offer, or else.."))
         if offering > bal:
             offering = int(bal)
         admin_roll = -1
@@ -4269,7 +4269,7 @@ class Adventure(commands.Cog):
                     await self.config.user(ctx.author).set(await character.to_json(self.config))
 
     @commands.group(autohelp=False)
-    @commands.cooldown(rate=1, per=5, type=commands.BucketType.user)
+    @commands.cooldown(rate=1, per=3, type=commands.BucketType.user)
     async def pet(self, ctx: commands.Context):
         """[Ranger Class Only]
 
@@ -5361,7 +5361,8 @@ class Adventure(commands.Cog):
             # Only let the bot owner specify a specific challenge
             challenge = None
 
-        adventure_msg = _("You feel adventurous, **{}**?").format(self.escape(ctx.author.display_name))
+        adventure_msg = _("@Adventurer")
+        _("Your adventure starts here **{}**!").format(self.escape(ctx.author.display_name))
         try:
             reward, participants = await self._simple(ctx, adventure_msg, challenge)
             await self.config.guild(ctx.guild).cooldown.set(time.time())
