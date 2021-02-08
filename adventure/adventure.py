@@ -5776,9 +5776,6 @@ class Adventure(commands.Cog):
             embed = discord.Embed(colour=discord.Colour.blurple())
             use_embeds = await self.config.guild(ctx.guild).embed() and ctx.channel.permissions_for(ctx.me).embed_links
             timeout = 60 * 3
-            tagged_member = _(
-                "@Adventurer""
-            )
             obscured_text = _(
                 "What will you do and will other heroes help your cause?\n"
                 "Heroes have {time} minutes to participate via reaction:"
