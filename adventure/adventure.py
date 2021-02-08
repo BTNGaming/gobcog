@@ -8137,6 +8137,24 @@ class Adventure(commands.Cog):
         else:
             return sorted_acc[:positions]
 
+    @commands.command(name="quest", cooldown_after_parsing=True)
+    @commands.cooldown(rate=1, per=1800, type=commands.BucketType.user)
+    async def commands_quest(self, ctx: commands.Context):
+        """Attempt a solo Quest."""
+        author = ctx.author
+        amount = 2500  # Have to randomize through text file
+        await smart_embed(
+            ctx,
+            _(
+                "You're trying to look around for a quest."
+                "Unfortunately, everyone turns their face in shame when you try to ask around."
+                "They laugh in your face because you are puny,{author}!"
+                "Maybe you should ask again later"
+            ).format(
+                author=author.mention,
+            )
+        )
+
     @commands.command(name="apayday", cooldown_after_parsing=True)
     @has_separated_economy()
     @commands.cooldown(rate=1, per=1800, type=commands.BucketType.user)
