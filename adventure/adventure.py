@@ -8142,12 +8142,12 @@ class Adventure(commands.Cog):
 
     @commands.command(name="apayday", cooldown_after_parsing=True)
     @has_separated_economy()
-    @commands.cooldown(rate=1, per=600, type=commands.BucketType.user)
+    @commands.cooldown(rate=1, per=1800, type=commands.BucketType.user)
     async def commands_apayday(self, ctx: commands.Context):
         """Get some free gold."""
         author = ctx.author
         adventure_credits_name = await bank.get_currency_name(ctx.guild)
-        amount = 500  # Make Customizable?
+        amount = 2500  # Make Customizable?
         try:
             await bank.deposit_credits(author, amount)
         except BalanceTooHigh as exc:
@@ -8180,7 +8180,7 @@ class Adventure(commands.Cog):
         except Exception as exc:
             log.exception("Error with the new character sheet", exc_info=exc)
         else:
-            if character.last_currency_check + 600 < time.time() or character.bal > character.last_known_currency:
+            if character.last_currency_check + 1800 < time.time() or character.bal > character.last_known_currency:
                 character.last_known_currency = await bank.get_balance(ctx.author)
                 character.last_currency_check = time.time()
                 await self.config.user(ctx.author).set(await character.to_json(self.config))
