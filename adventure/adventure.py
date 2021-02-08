@@ -5361,8 +5361,8 @@ class Adventure(commands.Cog):
             # Only let the bot owner specify a specific challenge
             challenge = None
 
-        adventure_msg = _("@Adventurer")
         adventure_msg = _("Your adventure starts here **{}**!").format(self.escape(ctx.author.display_name))
+        msg += _("@Adventurer")
         try:
             reward, participants = await self._simple(ctx, adventure_msg, challenge)
             await self.config.guild(ctx.guild).cooldown.set(time.time())
