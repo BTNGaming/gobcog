@@ -5362,7 +5362,7 @@ class Adventure(commands.Cog):
             challenge = None
 
         adventure_msg = _("@Adventurer")
-        _("Your adventure starts here **{}**!").format(self.escape(ctx.author.display_name))
+        adventure_msg = _("Your adventure starts here **{}**!").format(self.escape(ctx.author.display_name))
         try:
             reward, participants = await self._simple(ctx, adventure_msg, challenge)
             await self.config.guild(ctx.guild).cooldown.set(time.time())
