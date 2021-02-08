@@ -3048,7 +3048,7 @@ class Adventure(commands.Cog):
                     _("**{}**, you need to be a Tinkerer to do this.").format(self.escape(ctx.author.display_name)),
                 )
             else:
-                cooldown_time = max(1800, (7200 - max((c.luck + c.total_int) * 2, 0)))
+                cooldown_time = 3600
                 if "cooldown" not in c.heroclass:
                     c.heroclass["cooldown"] = cooldown_time + 1
                 if c.heroclass["cooldown"] > time.time():
@@ -4303,7 +4303,7 @@ class Adventure(commands.Cog):
                         )
                     )
                 else:
-                    cooldown_time = max(600, (3600 - max((c.luck + c.total_int) * 2, 0)))
+                    cooldown_time = 1800
                     if "catch_cooldown" not in c.heroclass:
                         c.heroclass["catch_cooldown"] = cooldown_time + 1
                     if c.heroclass["catch_cooldown"] > time.time():
@@ -4429,7 +4429,7 @@ class Adventure(commands.Cog):
                     )
                 )
                 return
-            cooldown_time = max(1800, (7200 - max((c.luck + c.total_int) * 2, 0)))
+            cooldown_time = 1800
             if "cooldown" not in c.heroclass:
                 c.heroclass["cooldown"] = cooldown_time + 1
             if c.heroclass["cooldown"] <= time.time():
@@ -4491,7 +4491,7 @@ class Adventure(commands.Cog):
                     return await smart_embed(
                         ctx, _("**{}**, ability already in use.").format(self.escape(ctx.author.display_name)),
                     )
-                cooldown_time = max(300, (1200 - max((c.luck + c.total_int) * 2, 0)))
+                cooldown_time = 600
                 if "cooldown" not in c.heroclass:
                     c.heroclass["cooldown"] = cooldown_time + 1
                 if c.heroclass["cooldown"] <= time.time():
@@ -4545,7 +4545,7 @@ class Adventure(commands.Cog):
                 return await smart_embed(
                     ctx, _("**{}**, ability already in use.").format(self.escape(ctx.author.display_name)),
                 )
-            cooldown_time = max(300, (900 - max((c.luck + c.total_cha) * 2, 0)))
+            cooldown_time = 600
             if "cooldown" not in c.heroclass:
                 c.heroclass["cooldown"] = cooldown_time + 1
             if c.heroclass["cooldown"] + cooldown_time <= time.time():
@@ -4705,7 +4705,7 @@ class Adventure(commands.Cog):
                     return await smart_embed(
                         ctx, _("**{}**, ability already in use.").format(self.escape(ctx.author.display_name)),
                     )
-                cooldown_time = max(300, (1200 - max((c.luck + c.total_att) * 2, 0)))
+                cooldown_time = 600
                 if "cooldown" not in c.heroclass:
                     c.heroclass["cooldown"] = cooldown_time + 1
                 if c.heroclass["cooldown"] <= time.time():
@@ -4752,7 +4752,7 @@ class Adventure(commands.Cog):
                     return await smart_embed(
                         ctx, _("**{}**, ability already in use.").format(self.escape(ctx.author.display_name)),
                     )
-                cooldown_time = 300
+                cooldown_time = 600
                 if "cooldown" not in c.heroclass:
                     c.heroclass["cooldown"] = cooldown_time + 1
                 if c.heroclass["cooldown"] <= time.time():
@@ -4800,7 +4800,7 @@ class Adventure(commands.Cog):
                     return await smart_embed(
                         ctx, _("**{}**, ability already in use.").format(self.escape(ctx.author.display_name)),
                     )
-                cooldown_time = max(300, (1200 - max((c.luck + c.total_cha) * 2, 0)))
+                cooldown_time = 600
                 if "cooldown" not in c.heroclass:
                     c.heroclass["cooldown"] = cooldown_time + 1
                 if c.heroclass["cooldown"] <= time.time():
