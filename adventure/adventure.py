@@ -4752,7 +4752,7 @@ class Adventure(commands.Cog):
                     return await smart_embed(
                         ctx, _("**{}**, ability already in use.").format(self.escape(ctx.author.display_name)),
                     )
-                cooldown_time = max(300, (1200 - max((c.luck + c.total_int) * 2, 0)))
+                cooldown_time = 300
                 if "cooldown" not in c.heroclass:
                     c.heroclass["cooldown"] = cooldown_time + 1
                 if c.heroclass["cooldown"] <= time.time():
