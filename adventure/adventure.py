@@ -2863,12 +2863,12 @@ class Adventure(commands.Cog):
                     "but the monster ahead is commanding your attention."
                 ),
             )
-        normalcost = 25
-        rarecost = 25
-        epiccost = 25
-        rebirth_normal = 2
-        rebirth_rare = 8
-        rebirth_epic = 10
+        normalcost = 15
+        rarecost = 15
+        epiccost = 15
+        rebirth_normal = 1
+        rebirth_rare = 1
+        rebirth_epic = 5
         if amount < 1:
             return await smart_embed(ctx, _("Nice try :smirk:"))
         if amount > 1:
