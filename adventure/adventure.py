@@ -2849,9 +2849,9 @@ class Adventure(commands.Cog):
     async def convert(self, ctx: commands.Context, box_rarity: str, amount: int = 1):
         """Convert normal, rare or epic chests.
 
-        Trade 25 normal chests for 1 rare chest.
-        Trade 25 rare chests for 1 epic chest.
-        Trade 25 epic chests for 1 legendary chest.
+        Trade 15 normal chests for 1 rare chest @ rebirth 1 or higher.
+        Trade 15 rare chests for 1 epic chest @ rebirth 1 or higher.
+        Trade 15 epic chests for 1 legendary chest @ rebirth 5 or higher.
         """
 
         # Thanks to flare#0001 for the idea and writing the first instance of this
