@@ -884,7 +884,7 @@ class Adventure(commands.Cog):
     ):
         """Complex backpack management tools.
 
-        Please read the usage instructions [here](https://github.com/aikaterna/gobcog/blob/master/docs/cbackpack.md)
+        Please read the usage instructions [here](https://rylwalds.com/complex-backpacks/)
         """
 
     @commands_cbackpack.command(name="show")
@@ -893,7 +893,7 @@ class Adventure(commands.Cog):
     ):
         """This shows the contents of your backpack.
 
-        Please read the usage instructions [here](https://github.com/aikaterna/gobcog/blob/master/docs/cbackpack.md)
+        Please read the usage instructions [here](https://rylwalds.com/complex-backpacks/)
         """
         if not await self.allow_in_dm(ctx):
             return await smart_embed(ctx, _("This command is not available in DM's on this bot."))
@@ -1009,7 +1009,7 @@ class Adventure(commands.Cog):
 
         Forged items cannot be sold using this command.
 
-        Please read the usage instructions [here](https://github.com/aikaterna/gobcog/blob/master/docs/cbackpack.md)
+        Please read the usage instructions [here](https://rylwalds.com/complex-backpacks/)
         """
 
         if self.in_adventure(ctx):
