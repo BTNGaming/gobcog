@@ -5204,6 +5204,166 @@ class Adventure(commands.Cog):
             form_string += f"\nPage {index}"
         return form_string
 
+@commands.command()
+    @commands.bot_has_permissions(add_reactions=True)
+    async def gear(self, ctx: commands.Context, *, user: discord.User = None):
+        """This draws up a character sheet of you or an optionally specified member."""
+        if not await self.allow_in_dm(ctx):
+            return await smart_embed(ctx, _("This command is not available in DM's on this bot."))
+        if user is None:
+            user = ctx.author
+        if user.bot:
+            return
+        try:
+            c = await Character.from_json(self.config, user, self._daily_bonus)
+        except Exception:
+            log.exception("Error with the new character sheet")
+            return
+        items = c.get_current_equipment(return_place_holder=True)
+        msg = _("{}'s Equipment Sheet\n\n").format(self.escape(user.display_name))
+        msg_len = len(msg)
+        items_names = set()
+        table = BeautifulTable(default_alignment=ALIGN_LEFT, maxwidth=500)
+        table.set_style(BeautifulTable.STYLE_RST)
+        msgs = []
+        total = len(items)
+        table.columns.header = [
+            "Name",
+            "Slot",
+            "ATT",
+            "CHA",
+            "INT",
+            "DEX",
+            "LUC",
+            "LVL",
+            "QTY",
+            "DEG",
+            "SET",
+        ]
+        async for index, item in AsyncIter(items, steps=100).enumerate(start=1):
+            if len(str(table)) > 1500:
+                msgs.append(box(msg + str(table) + f"\nPage {len(msgs) + 1}", lang="css"))
+                table = BeautifulTable(default_alignment=ALIGN_LEFT, maxwidth=500)
+                table.set_style(BeautifulTable.STYLE_RST)
+                table.columns.header = [
+                    "Name",
+                    "Slot",
+                    "ATT",
+                    "CHA",
+                    "INT",
+                    "DEX",
+                    "LUC",
+                    "LVL",
+                    "QTY",
+                    "DEG",
+                    "SET",
+                ]
+            item_name = str(item)
+            slots = len(item.slot)
+            slot_name = item.slot[0] if slots == 1 else "two handed"
+            if (item_name, slots, slot_name) in items_names:
+                continue
+            items_names.add((item_name, slots, slot_name))
+            data = (
+                item_name,
+                slot_name,
+                item.att * (1 if slots == 1 else 2),
+                item.cha * (1 if slots == 1 else 2),
+                item.int * (1 if slots == 1 else 2),
+                item.dex * (1 if slots == 1 else 2),
+                item.luck * (1 if slots == 1 else 2),
+                f"[{r}]" if (r := equip_level(c, item)) is not None and r > c.lvl else f"{r}",
+                item.owned,
+                f"[{item.degrade}]"
+                if item.rarity in ["legendary", "event", "ascended"] and item.degrade >= 0
+                else "N/A",
+                item.set or "N/A",
+            )
+            if data not in table.rows:
+                table.rows.append(data)
+            if index == total:
+                table.set_style(BeautifulTable.STYLE_RST)
+                msgs.append(box(msg + str(table) + f"\nPage {len(msgs) + 1}", lang="css"))
+        await BaseMenu(
+            source=SimpleSource([box(c, lang="css"), *msgs]),
+            delete_message_after=True,
+            clear_reactions_after=True,
+            timeout=60,
+        ).start(ctx=ctx)
+
+    async def _build_loadout_display(self, userdata, loadout=True, rebirths: int = None, index: int = None):
+        table = BeautifulTable(default_alignment=ALIGN_LEFT, maxwidth=500)
+        table.set_style(BeautifulTable.STYLE_RST)
+        table.columns.header = [
+            "Name",
+            "Slot",
+            "ATT",
+            "CHA",
+            "INT",
+            "DEX",
+            "LUC",
+            "LVL",
+            "SET",
+        ]
+        form_string = ""
+        last_slot = ""
+        att = 0
+        cha = 0
+        intel = 0
+        dex = 0
+        luck = 0
+
+        def get_slot_index(slot):
+            slot = slot[0]
+            if slot not in ORDER:
+                return float("inf")
+            return ORDER.index(slot)
+
+        data_sorted = sorted(userdata["items"].items(), key=get_slot_index)
+        items_names = set()
+        for (slot, data) in data_sorted:
+            if slot == "backpack":
+                continue
+            if last_slot == "two handed":
+                last_slot = slot
+                continue
+            if not data:
+                continue
+            item = Item.from_json(data)
+            item_name = str(item)
+            slots = len(item.slot)
+            slot_name = item.slot[0] if slots == 1 else "two handed"
+            if (item_name, slots, slot_name) in items_names:
+                continue
+            items_names.add((item_name, slots, slot_name))
+            data = (
+                item_name,
+                slot_name,
+                item.att * (1 if slots == 1 else 2),
+                item.cha * (1 if slots == 1 else 2),
+                item.int * (1 if slots == 1 else 2),
+                item.dex * (1 if slots == 1 else 2),
+                item.luck * (1 if slots == 1 else 2),
+                equip_level(None, item, rebirths),
+                item.set or "N/A",
+            )
+            if data not in table.rows:
+                table.rows.append(data)
+            att += item.att
+            cha += item.cha
+            intel += item.int
+            dex += item.dex
+            luck += item.luck
+
+        table.set_style(BeautifulTable.STYLE_RST)
+        form_string += str(table)
+
+        form_string += _("\n\nTotal stats: ")
+        form_string += f"({att} | {cha} | {intel} | {dex} | {luck})"
+        if index is not None:
+            form_string += f"\nPage {index}"
+        return form_string
+
     @commands.command()
     async def unequip(self, ctx: commands.Context, *, item: EquipmentConverter):
         """This stashes a specified equipped item into your backpack.
