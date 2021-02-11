@@ -922,7 +922,7 @@ class Adventure(commands.Cog):
         This will provide a chance for a chest,
         or the item might break while you are handling it...
 
-        Please read the usage instructions [here](https://github.com/aikaterna/gobcog/blob/master/docs/cbackpack.md)
+        Please read the usage instructions [here](https://rylwalds.com/complex-backpacks/)
         """
         if self.in_adventure(ctx):
             return await smart_embed(
