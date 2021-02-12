@@ -5324,7 +5324,7 @@ class Adventure(commands.Cog):
         await ctx.tick()
 
     @commands.cooldown(rate=1, per=5, type=commands.BucketType.guild)
-    @commands.command(name="adventure", aliases=["a"])
+    @commands.command(name="adventure", aliases=["a", "adv"])
     @commands.bot_has_permissions(add_reactions=True)
     @commands.guild_only()
     async def _adventure(self, ctx: commands.Context, *, challenge=None):
