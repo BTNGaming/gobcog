@@ -828,7 +828,7 @@ class Adventure(commands.Cog):
         await self.config.user(ctx.author).set(user_data)
         await ctx.tick()
 
-    @commands.command(name="ebackpack")
+    @commands.command(name="ebackpack", aliases=["ebp"])
     @commands.bot_has_permissions(add_reactions=True)
     async def commands_equipable_backpack(
         self,
@@ -3937,7 +3937,7 @@ class Adventure(commands.Cog):
                 source=SimpleSource(msgs), delete_message_after=True, clear_reactions_after=True, timeout=60,
             ).start(ctx=ctx)
 
-    @commands.command(name="negaverse", aliases=["nv"], cooldown_after_parsing=True)
+    @commands.command(name="negaverse", aliases=["nv", "nega"], cooldown_after_parsing=True)
     @commands.cooldown(rate=1, per=3600, type=commands.BucketType.user)
     @commands.guild_only()
     async def _negaverse(
@@ -8145,7 +8145,7 @@ class Adventure(commands.Cog):
         else:
             return sorted_acc[:positions]
 
-    @commands.command(name="quest", cooldown_after_parsing=True)
+    @commands.command(name="quest", aliases=["q"] cooldown_after_parsing=True)
     @commands.cooldown(rate=1, per=1800, type=commands.BucketType.user)
     async def commands_quest(self, ctx: commands.Context):
         """Attempt a solo Quest."""
@@ -8163,7 +8163,7 @@ class Adventure(commands.Cog):
             )
         )
 
-    @commands.command(name="apayday", cooldown_after_parsing=True)
+    @commands.command(name="apayday", aliases=["payday", "payme"] cooldown_after_parsing=True)
     @has_separated_economy()
     @commands.cooldown(rate=1, per=1800, type=commands.BucketType.user)
     async def commands_apayday(self, ctx: commands.Context):
