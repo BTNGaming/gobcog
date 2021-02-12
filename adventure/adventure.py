@@ -3792,7 +3792,7 @@ class Adventure(commands.Cog):
     def check_running_adventure(ctx):
         for (guild_id, session) in ctx.bot.get_cog("Adventure")._sessions.items():
             user_ids: list = []
-            options = ["fight", "magic", "talk", "pray"]
+            options = ["fight", "magic", "talk", "pray", "run"]
             for i in options:
                 user_ids += [u.id for u in getattr(session, i)]
             if ctx.author.id in user_ids:
@@ -5722,6 +5722,8 @@ class Adventure(commands.Cog):
                 + _("Talk")
                 + "** - **"
                 + _("Pray")
+                + "** - **"
+                + _("Run")
                 + "**",
             )
             basilisk_text = _(
@@ -5740,6 +5742,8 @@ class Adventure(commands.Cog):
                 + _("Talk")
                 + "** - **"
                 + _("Pray")
+                + "** - **"
+                + _("Run")
                 + "**",
             )
             normal_text = _(
@@ -5760,6 +5764,8 @@ class Adventure(commands.Cog):
                 + _("Talk")
                 + "** - **"
                 + _("Pray")
+                + "** - **"
+                + _("Run")
                 + "**",
             )
 
@@ -5812,6 +5818,8 @@ class Adventure(commands.Cog):
                 + _("Talk")
                 + "** - **"
                 + _("Pray")
+                + "** - **"
+                + _("Run")
                 + "**",
                 time=timeout // 60,
             )
@@ -5906,7 +5914,7 @@ class Adventure(commands.Cog):
         action = {v: k for k, v in self._adventure_controls.items()}[str(reaction.emoji)]
         session = self._sessions[user.guild.id]
         has_fund = await has_funds(user, 250)
-        for x in ["fight", "magic", "talk", "pray"]:
+        for x in ["fight", "magic", "talk", "pray", "run"]:
             if user in getattr(session, x, []):
                 getattr(session, x).remove(user)
 
@@ -7028,7 +7036,7 @@ class Adventure(commands.Cog):
                     diplomacy += int((roll - bonus + dipl_value + rebirths) / cdef)
                     report += (
                         f"**{self.escape(user.display_name)}** "
-                        f"🎲({roll}) +💥{bonus} +🗨{humanize_number(dipl_value)}\n"
+                        f"🎲({roll}) +💥{bonus} +🗨{humanize_number(dipl_value)} | "
                     )
                 else:
                     msg += _("{}**{}** accidentally offended the enemy.\n").format(
