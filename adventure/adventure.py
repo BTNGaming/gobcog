@@ -5711,8 +5711,6 @@ class Adventure(commands.Cog):
                 + _("Talk")
                 + "** - **"
                 + _("Pray")
-                + "** - **"
-                + _("Run")
                 + "**",
             )
             basilisk_text = _(
@@ -5731,8 +5729,6 @@ class Adventure(commands.Cog):
                 + _("Talk")
                 + "** - **"
                 + _("Pray")
-                + "** - **"
-                + _("Run")
                 + "**",
             )
             normal_text = _(
@@ -5753,8 +5749,6 @@ class Adventure(commands.Cog):
                 + _("Talk")
                 + "** - **"
                 + _("Pray")
-                + "** - **"
-                + _("Run")
                 + "**",
             )
 
@@ -5807,8 +5801,6 @@ class Adventure(commands.Cog):
                 + _("Talk")
                 + "** - **"
                 + _("Pray")
-                + "** - **"
-                + _("Run")
                 + "**",
                 time=timeout // 60,
             )
