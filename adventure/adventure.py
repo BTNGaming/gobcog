@@ -188,13 +188,17 @@ class AdventureResults:
         num_wins = 0
         stat_type = "hp"
         avg_amount = 0
-        raids = self._last_raids.get(ctx.guild.id, [])
+        raids = self._last_raids.get(ctx.guild.id, [])  # only use last 3 raids for stat measurement
         raid_count = len(raids)
         if raid_count == 0:
             num_wins = self._num_raids // 2
             raid_count = self._num_raids
             win_percent = 0.5
         else:
+            n = 0
+            avg_count = 3
+            winrate_count = 6
+
             for raid in raids:
                 if raid["main_action"] == "attack":
                     num_attack += 1
@@ -208,15 +212,28 @@ class AdventureResults:
                         talk_amount += raid["amount"] * SOLO_RAID_SCALE
                 log.debug(f"raid dmg: {raid['amount']}")
                 if raid["success"]:
+                if n < avg_count:
+                    if raid["main_action"] == "attack":
+                        num_attack += 1
+                        dmg_amount += raid["amount"]
+                        if raid["num_ppl"] == 1:
+                            dmg_amount += raid["amount"] * SOLO_RAID_SCALE
+                    else:
+                        num_talk += 1
+                        talk_amount += raid["amount"]
+                        if raid["num_ppl"] == 1:
+                            talk_amount += raid["amount"] * SOLO_RAID_SCALE
+                    log.debug(f"raid dmg: {raid['amount']}")
+                if raid["success"] and n < winrate_count:
                     num_wins += 1
             if num_attack > 0:
                 avg_amount = dmg_amount / num_attack
             if dmg_amount < talk_amount:
                 stat_type = "dipl"
                 avg_amount = talk_amount / num_talk
-            win_percent = num_wins / raid_count
+            win_percent = num_wins / winrate_count
             min_stat = avg_amount * 0.75
-            max_stat = avg_amount * 2
+            max_stat = avg_amount * 1.50
             # want win % to be at least 50%, even when solo
             # if win % is below 50%, scale back min/max for easier mons
             if win_percent < 0.5:
@@ -281,14 +298,12 @@ class Adventure(commands.Cog):
             self.emojis.magic,
             self.emojis.talk,
             self.emojis.pray,
-            self.emojis.run,
         ]
         self._adventure_controls = {
             "fight": self.emojis.attack,
             "magic": self.emojis.magic,
             "talk": self.emojis.talk,
             "pray": self.emojis.pray,
-            "run": self.emojis.run,
         }
         self._order = [
             "head",
@@ -3777,7 +3792,7 @@ class Adventure(commands.Cog):
     def check_running_adventure(ctx):
         for (guild_id, session) in ctx.bot.get_cog("Adventure")._sessions.items():
             user_ids: list = []
-            options = ["fight", "magic", "talk", "pray", "run"]
+            options = ["fight", "magic", "talk", "pray"]
             for i in options:
                 user_ids += [u.id for u in getattr(session, i)]
             if ctx.author.id in user_ids:
@@ -5205,13 +5220,14 @@ class Adventure(commands.Cog):
         return form_string
 
     @commands.command(name="balance", aliases=["bal", "credits"])
-    async def _balance(self, ctx: commands.Context):
-        bal = await bank.get_balance(ctx.author)
+    async def _balance(self, ctx: commands.Context, *, member: discord.Member = None):
+        member = member or ctx.author
+        bal = await bank.get_balance(member)
 
         await smart_embed(
             ctx,
-            _("{author.mention} You currently have {new_balance} {currency}.").format(
-                author=ctx.author,
+            _("{member.mention} currently has {new_balance} {currency}.").format(
+                member=member,
                 new_balance=humanize_number(bal),
                 currency=await bank.get_currency_name(ctx.guild),
             ),
@@ -5706,8 +5722,6 @@ class Adventure(commands.Cog):
                 + _("Talk")
                 + "** - **"
                 + _("Pray")
-                + "** - **"
-                + _("Run")
                 + "**",
             )
             basilisk_text = _(
@@ -5726,8 +5740,6 @@ class Adventure(commands.Cog):
                 + _("Talk")
                 + "** - **"
                 + _("Pray")
-                + "** - **"
-                + _("Run")
                 + "**",
             )
             normal_text = _(
@@ -5748,8 +5760,6 @@ class Adventure(commands.Cog):
                 + _("Talk")
                 + "** - **"
                 + _("Pray")
-                + "** - **"
-                + _("Run")
                 + "**",
             )
 
@@ -5802,8 +5812,6 @@ class Adventure(commands.Cog):
                 + _("Talk")
                 + "** - **"
                 + _("Pray")
-                + "** - **"
-                + _("Run")
                 + "**",
                 time=timeout // 60,
             )
@@ -5883,7 +5891,7 @@ class Adventure(commands.Cog):
             if reaction.message.id == self._sessions[guild.id].message_id:
                 if guild.id in self._adventure_countdown:
                     (timer, done, sremain) = self._adventure_countdown[guild.id]
-                    if sremain > 3:
+                    if sremain > 0:
                         await self._handle_adventure(reaction, user)
         if guild.id in self._current_traders:
             if reaction.message.id == self._current_traders[guild.id]["msg"] and not self.in_adventure(user=user):
@@ -5891,14 +5899,14 @@ class Adventure(commands.Cog):
                     return
                 if guild.id in self._trader_countdown:
                     (timer, done, sremain) = self._trader_countdown[guild.id]
-                    if sremain > 3:
+                    if sremain > 0:
                         await self._handle_cart(reaction, user)
 
     async def _handle_adventure(self, reaction, user):
         action = {v: k for k, v in self._adventure_controls.items()}[str(reaction.emoji)]
         session = self._sessions[user.guild.id]
         has_fund = await has_funds(user, 250)
-        for x in ["fight", "magic", "talk", "pray", "run"]:
+        for x in ["fight", "magic", "talk", "pray"]:
             if user in getattr(session, x, []):
                 getattr(session, x).remove(user)
 
@@ -7020,7 +7028,7 @@ class Adventure(commands.Cog):
                     diplomacy += int((roll - bonus + dipl_value + rebirths) / cdef)
                     report += (
                         f"**{self.escape(user.display_name)}** "
-                        f"🎲({roll}) +💥{bonus} +🗨{humanize_number(dipl_value)} | "
+                        f"🎲({roll}) +💥{bonus} +🗨{humanize_number(dipl_value)}\n"
                     )
                 else:
                     msg += _("{}**{}** accidentally offended the enemy.\n").format(
@@ -7268,6 +7276,29 @@ class Adventure(commands.Cog):
         final_words = [lowercase_words[0].capitalize()]
         final_words += [word if word in exceptions else word.capitalize() for word in lowercase_words[1:]]
         return " ".join(final_words)
+
+    @commands.Cog.listener()
+    async def on_reaction_remove(self, reaction, user):
+        """This will be a cog level reaction_add listener for game logic."""
+        await self.bot.wait_until_ready()
+        if user.bot:
+            return
+        try:
+            guild = user.guild
+        except AttributeError:
+            return
+        emojis = ReactionPredicate.NUMBER_EMOJIS + self._adventure_actions
+        if str(reaction.emoji) not in emojis:
+            return
+        if not await self.has_perm(user):
+            return
+        if guild.id in self._sessions:
+            if reaction.message.id == self._sessions[guild.id].message_id:
+                if guild.id in self._adventure_countdown:
+                    (timer, done, sremain) = self._adventure_countdown[guild.id]
+                    if sremain > 0:
+                        reaction.emoji = self.emojis.run
+                        await self._handle_adventure(reaction, user)
 
     @commands.Cog.listener()
     async def on_message_without_command(self, message):
@@ -8382,6 +8413,7 @@ class Adventure(commands.Cog):
                 tax=highest,
                 transfered=humanize_number(transfered),
             )
+            success=True
         )
 
     @commands_atransfer.command(name="give")
