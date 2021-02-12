@@ -3937,7 +3937,7 @@ class Adventure(commands.Cog):
                 source=SimpleSource(msgs), delete_message_after=True, clear_reactions_after=True, timeout=60,
             ).start(ctx=ctx)
 
-    @commands.command(name="negaverse", aliases=["nv", "nega"], cooldown_after_parsing=True)
+    @commands.command(name="negaverse", aliases=["nv", "nega"] cooldown_after_parsing=True)
     @commands.cooldown(rate=1, per=3600, type=commands.BucketType.user)
     @commands.guild_only()
     async def _negaverse(
