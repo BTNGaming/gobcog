@@ -5203,7 +5203,19 @@ class Adventure(commands.Cog):
         if index is not None:
             form_string += f"\nPage {index}"
         return form_string
-        
+
+    @commands.command(name="balance", aliases=["bal", "credits"])
+    async def _balance(self, ctx: commands.Context):
+        bal = await bank.get_balance(ctx.author)
+
+        await smart_embed(
+            ctx,
+            _("{author.mention} You currently have {new_balance} {currency}.").format(
+                author=ctx.author,
+                new_balance=humanize_number(bal),
+                currency=await bank.get_currency_name(ctx.guild),
+            ),
+        )
 
     @commands.command()
     async def unequip(self, ctx: commands.Context, *, item: EquipmentConverter):
