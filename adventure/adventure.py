@@ -188,17 +188,17 @@ class AdventureResults:
         num_wins = 0
         stat_type = "hp"
         avg_amount = 0
-        raids = self._last_raids.get(ctx.guild.id, [])  # only use last 3 raids for stat measurement
+        raids = self._last_raids.get(ctx.guild.id, [])[-5:]  # only use last 3 raids for stat measurement
         raid_count = len(raids)
         if raid_count == 0:
             num_wins = self._num_raids // 2
             raid_count = self._num_raids
-            win_percent = 0.5
+            win_percent = 0.6
         else:
             n = 0
             avg_count = 3
-            winrate_count = 6
-
+            winrate_count = 5
+            
             for raid in raids:
                 if raid["main_action"] == "attack":
                     num_attack += 1
@@ -212,28 +212,15 @@ class AdventureResults:
                         talk_amount += raid["amount"] * SOLO_RAID_SCALE
                 log.debug(f"raid dmg: {raid['amount']}")
                 if raid["success"]:
-                if n < avg_count:
-                    if raid["main_action"] == "attack":
-                        num_attack += 1
-                        dmg_amount += raid["amount"]
-                        if raid["num_ppl"] == 1:
-                            dmg_amount += raid["amount"] * SOLO_RAID_SCALE
-                    else:
-                        num_talk += 1
-                        talk_amount += raid["amount"]
-                        if raid["num_ppl"] == 1:
-                            talk_amount += raid["amount"] * SOLO_RAID_SCALE
-                    log.debug(f"raid dmg: {raid['amount']}")
-                if raid["success"] and n < winrate_count:
                     num_wins += 1
             if num_attack > 0:
                 avg_amount = dmg_amount / num_attack
             if dmg_amount < talk_amount:
                 stat_type = "dipl"
                 avg_amount = talk_amount / num_talk
-            win_percent = num_wins / winrate_count
+            win_percent = num_wins / raid_count
             min_stat = avg_amount * 0.75
-            max_stat = avg_amount * 1.50
+            max_stat = avg_amount * 2
             # want win % to be at least 50%, even when solo
             # if win % is below 50%, scale back min/max for easier mons
             if win_percent < 0.5:
@@ -5516,7 +5503,7 @@ class Adventure(commands.Cog):
 
     def _dynamic_monster_stats(self, ctx: commands.Context, choice: MutableMapping):
         stat_range = self._adv_results.get_stat_range(ctx)
-        win_percentage = stat_range.get("win_percent", 0.5)
+        win_percentage = stat_range.get("win_percent", 0.6)
         choice["cdef"] = choice.get("cdef", 1.0)
         if win_percentage >= 0.90:
             monster_hp_min = int(choice["hp"] * 2)
@@ -5540,7 +5527,7 @@ class Adventure(commands.Cog):
             monster_mdef = choice["mdef"] * percent_mdef
             percent_cdef = random.randrange(15, 25) / 100
             monster_cdef = choice["cdef"] * percent_cdef
-        elif win_percentage >= 0.50:
+        elif win_percentage >= 0.60:
             monster_hp_min = int(choice["hp"])
             monster_hp_max = int(choice["hp"] * 1.5)
             monster_diplo_min = int(choice["dipl"])
@@ -5901,7 +5888,7 @@ class Adventure(commands.Cog):
             if reaction.message.id == self._sessions[guild.id].message_id:
                 if guild.id in self._adventure_countdown:
                     (timer, done, sremain) = self._adventure_countdown[guild.id]
-                    if sremain > 0:
+                    if sremain > 3:
                         await self._handle_adventure(reaction, user)
         if guild.id in self._current_traders:
             if reaction.message.id == self._current_traders[guild.id]["msg"] and not self.in_adventure(user=user):
@@ -5909,7 +5896,7 @@ class Adventure(commands.Cog):
                     return
                 if guild.id in self._trader_countdown:
                     (timer, done, sremain) = self._trader_countdown[guild.id]
-                    if sremain > 0:
+                    if sremain > 3:
                         await self._handle_cart(reaction, user)
 
     async def _handle_adventure(self, reaction, user):
