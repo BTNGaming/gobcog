@@ -285,14 +285,12 @@ class Adventure(commands.Cog):
             self.emojis.magic,
             self.emojis.talk,
             self.emojis.pray,
-            self.emojis.run,
         ]
         self._adventure_controls = {
             "fight": self.emojis.attack,
             "magic": self.emojis.magic,
             "talk": self.emojis.talk,
             "pray": self.emojis.pray,
-            "run": self.emojis.run,
         }
         self._order = [
             "head",
@@ -691,7 +689,7 @@ class Adventure(commands.Cog):
             [
                 p.id
                 for _loop, session in self._sessions.items()
-                for p in [*session.fight, *session.magic, *session.pray, *session.talk, *session.run,]
+                for p in [*session.fight, *session.magic, *session.pray, *session.talk]
             ]
         )
         return bool(author.id in participants_ids)
@@ -3781,7 +3779,7 @@ class Adventure(commands.Cog):
     def check_running_adventure(ctx):
         for (guild_id, session) in ctx.bot.get_cog("Adventure")._sessions.items():
             user_ids: list = []
-            options = ["fight", "magic", "talk", "pray", "run"]
+            options = ["fight", "magic", "talk", "pray"]
             for i in options:
                 user_ids += [u.id for u in getattr(session, i)]
             if ctx.author.id in user_ids:
@@ -5895,7 +5893,7 @@ class Adventure(commands.Cog):
         action = {v: k for k, v in self._adventure_controls.items()}[str(reaction.emoji)]
         session = self._sessions[user.guild.id]
         has_fund = await has_funds(user, 250)
-        for x in ["fight", "magic", "talk", "pray", "run"]:
+        for x in ["fight", "magic", "talk", "pray"]:
             if user in getattr(session, x, []):
                 getattr(session, x).remove(user)
 
